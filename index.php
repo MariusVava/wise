@@ -182,7 +182,7 @@ Displaying <span class="badge badge-dark">STATISTICAL INFORMATION</span> from th
   </a>
 </div>
 &nbsp;
-<div class="container">
+<div class="container-fluid">
 <table class="table table-striped table-dark table-hover js-sort-table" id="wise_table">
   <thead>
     <tr>
@@ -192,7 +192,9 @@ Displaying <span class="badge badge-dark">STATISTICAL INFORMATION</span> from th
       <th class="js-sort-number" scope="col">NEW USERS</th>
       <th class="js-sort-number" scope="col">TOTAL ETH</th>
       <th class="js-sort-number" scope="col">ETH ADDED</th>
+      <th class="js-sort-number" scope="col">SIMULATE</th>
       <th class="js-sort-number" scope="col">1 ETH VALUE</th>
+      <th class="js-sort-number" scope="col">1 ETH CLOSED</th>
       <th class="js-sort-number" scope="col">1 WISE VALUE</th>
       <th class="js-sort-number" scope="col">ROI</th>
     </tr>
@@ -203,7 +205,7 @@ Displaying <span class="badge badge-dark">STATISTICAL INFORMATION</span> from th
 $value_multiplyer = 1.3;
 $wise_multiplyer = $value_multiplyer*$wise_value_estimate;
 $wise_worth_buying = round($wise_multiplyer, 4);
-
+$eth_value_all = 0;
 for($i = 0; $i < count($total_eth[1]); $i++) {
 
     $eth_value = 5000000/$total_eth[1][$i];
@@ -231,7 +233,7 @@ for($i = 0; $i < count($total_eth[1]); $i++) {
     }
     echo $tr;
     echo $badge;
-    echo  '<th scope="row">'.$date[1][$i].'</th>';
+    echo  '<th style="vertical-align:middle" scope="row">'.str_replace(" - Day #"," (",str_replace("/",".",$date[1][$i])).')</th>';
 
     $user_diff = $investors[1][$i] - $investors_previous[1][$i];
     if ($user_diff > 0){
@@ -242,8 +244,8 @@ for($i = 0; $i < count($total_eth[1]); $i++) {
         $user_diff = "";
     }
 
-    echo  '<td style="text-align:right">'.$investors[1][$i].'</td>';
-    echo '<td style="text-align:left">'.$user_diff.'</td>';
+    echo  '<td style="text-align:right;vertical-align:middle">'.$investors[1][$i].'</td>';
+    echo '<td style="text-align:left;vertical-align:middle">'.$user_diff.'</td>';
 
     $eth_diff = round($total_eth[1][$i] - $total_eth_previous[1][$i], 2);
     if ($eth_diff > 0){
@@ -253,15 +255,23 @@ for($i = 0; $i < count($total_eth[1]); $i++) {
     else {
         $eth_diff = "";
     }
-    echo  '<td style="text-align:right">'.$total_eth[1][$i].' ETH</td>';
-    echo '<td style="text-align:left">'.$eth_diff.'</td>';
-    echo  '<td>'.$eth_value.' WISE</td>';
+    echo  '<td style="text-align:right;vertical-align:middle">'.$total_eth[1][$i].' <span class="badge badge-light">ETH</span></td>';
+    echo '<td style="text-align:left;vertical-align:middle">'.$eth_diff.'</td>';
+    echo '<td style="text-align:left;vertical-align:middle">
+    <div class="input-group-sm mb-3">
+        <input type="text" class="form-control" placeholder="+ETH" size="4">
+    </div>
+    </td>';
+    echo  '<td style="vertical-align:middle">'.$eth_value.' <span class="badge badge-light">WISE</span></td>';
+    $eth_value_all += $total_eth[1][$i];
     $wise_value = $total_eth[1][$i]/5000000;
     $wise_value = number_format($wise_value, 9);
-    echo  '<td>'.$wise_value.' ETH</td>';
+    $eth_value_closed = round(($i+1)*5000000/$eth_value_all, 4);
+    echo  '<td style="vertical-align:middle">'.$eth_value_closed.' <span class="badge badge-light">WISE</span></td>';  
+    echo  '<td style="vertical-align:middle">'.$wise_value.' <span class="badge badge-light">ETH</span></td>';
     $roi = $eth_value/$wise_value_estimate;
     $roi = round($roi, 1);
-    echo  '<td>'.$roi.' X</td>';
+    echo  '<td style="vertical-align:middle">'.$roi.' X</td>';
     echo "</tr>";
 }
 
