@@ -1,0 +1,2 @@
+INSERT INTO wallets( wallet, total, transactions)
+SELECT wallet_from as wallet , SUM(eth_in) as total, COUNT(*) as transactions FROM etherscan GROUP BY wallet_from

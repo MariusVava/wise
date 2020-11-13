@@ -39,6 +39,7 @@ $h12 = "btn-danger";
 $h6 = "btn-danger";
 $h2 = "btn-danger";
 $h1 = "btn-danger";
+$button_custom_hours = '';
 if (isset($_GET["hours"])){
     $timeframe = $_GET["hours"];
     if ($timeframe == 12){
@@ -60,9 +61,16 @@ if (isset($_GET["hours"])){
                     $h1 = "btn-success";
                 }
                 else {
-                    $previous_file = $files[479]; 
-                    $timeframe = 24;
+                  if ($timeframe == 24){
                     $h24 = "btn-success";
+                  }
+                  else{
+                    $button_custom_hours = '<a class="btn btn-success" href="?hours='.$_GET["hours"].'"> '.$_GET["hours"].' hours</a>';
+                  }
+                    $hour_file = $_GET["hours"]*60/3;
+                    $previous_file = $files[$hour_file]; 
+                    $timeframe = $_GET["hours"];
+                    #$h24 = "btn-success";
                 }
             }
         }
@@ -181,7 +189,9 @@ function myFunction() {
 </div>
 &nbsp;
 <div class="container">
+<form action="/wise" method="get">
 Displaying <span class="badge badge-dark">STATISTICAL INFORMATION</span> from the past:  
+  <?php echo $button_custom_hours; ?>
   <a class="btn <?php echo $h24; ?>" href="?hours=24"> 24 hours
   </a>
   <a class="btn <?php echo $h12; ?>" href="?hours=12"> 12 hours
@@ -192,6 +202,7 @@ Displaying <span class="badge badge-dark">STATISTICAL INFORMATION</span> from th
   </a>
   <a class="btn <?php echo $h1; ?>" href="?hours=1">1 hours
   </a>
+  <input type="text" placeholder="custom" maxlength="4" size="4" style="width: 100px;" name="hours">&nbsp;<button class="btn btn-danger" type="submit">WIEW</button></form>
 </div>
 &nbsp;
 <div class="container-fluid">
@@ -306,8 +317,9 @@ $chart_wise_value = str_replace("remove, ","",$chart_wise_value);
 <div class="container-fluid">
     <div class="row my-3">
         <div class="col">
-            <center><h4><span class="badge badge-primary"><strong>EOS</strong></span> trending hystorical data vs <span class="badge badge-success"><strong>WISE</strong></span> live data</h4></center>
+            <center><h4><span class="badge badge-primary"><strong>EOS/HEX</strong></span> trending hystorical data vs <span class="badge badge-success"><strong>WISE</strong></span> live data</h4></center>
             <br /><h6><span class="badge badge-primary">+</span> <strong>EOS</strong> volume traded <strong>in USD</strong> divided by 30.000 for scale, 1 point = 7 days</h6>
+            <br /><h6><span class="badge badge-danger">+</span> <strong>ETH</strong> value <strong>in HEX</strong> divided by 200 for scale, 1 point = 7 days</h6>
             <br /><h6><span class="badge badge-success">+</span> <strong>WISE</strong> value <strong>in ETH</strong> multiplied by 5.000.000 for scale</h6>
         </div>
     </div>
@@ -329,7 +341,7 @@ $chart_wise_value = str_replace("remove, ","",$chart_wise_value);
   /* chart.js chart examples */
 
 // chart colors
-var colors = ['#007bff','#28a745','#333333','#c3e6cb','#dc3545','#6c757d'];
+var colors = ['#007bff','#28a745','#333333','#c3e6cb','#dc3545','#6c757d', '#ff33c7'];
 
 /* large line chart */
 var chLine = document.getElementById("chLine");
@@ -387,34 +399,61 @@ var chartData = {
   },
   /* WISE DATA */
   {
-    <?php
-    /*
-      #$chart_wise_value
-      function str_putcsv($data) {
-        # Generate CSV data from array
-        $fh = fopen('php://temp', 'rw'); # don't create a file, attempt
-                                         # to use memory instead
-
-        # write out the headers
-        fputcsv($fh, array_keys(current($data)));
-
-        # write out the data
-        foreach ( $data as $row ) {
-                fputcsv($fh, $row);
-        }
-        rewind($fh);
-        $csv = stream_get_contents($fh);
-        fclose($fh);
-
-        return $csv;
-      }
-      */
-    ?>
     data: [<?php echo $chart_wise_value; ?>],
     backgroundColor: colors[3],
     borderColor: colors[1],
     borderWidth: 4,
     pointBackgroundColor: colors[1]
+  },
+    /* WISE DATA */
+  <?php
+  error_reporting(0);
+  define('DB_NAME', 'wise'); //Your DB Name
+  define('DB_USER', 'wise'); //Your DB User Name
+  define('DB_PASSWORD', 'wise'); //Your DB Password
+  define('DB_HOST', 'localhost'); //Your Host Name
+    
+  // Create connection
+  $db = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+  // Check connection
+  if ($db->connect_error) {
+      die("Connection failed: " . $db->connect_error);
+  }
+
+  $result = $db->query("SELECT * FROM hex_launch");
+            $i = 1;
+            $sum = 0;
+            $hex_values="";
+            while($val = $result->fetch_assoc()){
+                #print_r($val);
+              if($i % 7 == 0){
+                $sum += $val['eth_in_hex'];
+                #echo "<br />$i  is divisible by 7";
+                if ($i == 7){
+                  $hex_values=$hex_values.$sum/7/200;
+                  #echo $eos_values;
+                }
+                else {
+                  $hex_values=$hex_values.", ".$sum/7/200;
+                  #echo $eos_values;
+                }
+                $sum = 0;
+              }
+              else{
+                $sum += $val['eth_in_hex'];
+                #echo "<br />$i <strong>is NOT divisible by 7</strong>";
+                #echo $eos_values;
+              }
+            $i++;
+            }
+  $db->close();
+  ?>
+  {
+  data: [<?php echo $hex_values; ?>],
+    backgroundColor: 'transparent',
+    borderColor: colors[6],
+    borderWidth: 4,
+    pointBackgroundColor: colors[6]
   }]
 };
 
