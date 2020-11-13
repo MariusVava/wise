@@ -319,7 +319,7 @@ $chart_wise_value = str_replace("remove, ","",$chart_wise_value);
         <div class="col">
             <center><h4><span class="badge badge-primary"><strong>EOS/HEX</strong></span> trending hystorical data vs <span class="badge badge-success"><strong>WISE</strong></span> live data</h4></center>
             <br /><h6><span class="badge badge-primary">+</span> <strong>EOS</strong> volume traded <strong>in USD</strong> divided by 30.000 for scale, 1 point = 7 days</h6>
-            <br /><h6><span class="badge badge-danger">+</span> <strong>ETH</strong> value <strong>in HEX</strong> divided by 200 for scale, 1 point = 7 days</h6>
+            <br /><h6><span class="badge badge-danger">+</span> <strong>USD</strong> value <strong>in HEX</strong> multiplied by 10.000.000 for scale, 1 point = 7 days</h6>
             <br /><h6><span class="badge badge-success">+</span> <strong>WISE</strong> value <strong>in ETH</strong> multiplied by 5.000.000 for scale</h6>
         </div>
     </div>
@@ -400,7 +400,7 @@ var chartData = {
   /* WISE DATA */
   {
     data: [<?php echo $chart_wise_value; ?>],
-    backgroundColor: colors[3],
+    backgroundColor: 'transparent',
     borderColor: colors[1],
     borderWidth: 4,
     pointBackgroundColor: colors[1]
@@ -420,21 +420,21 @@ var chartData = {
       die("Connection failed: " . $db->connect_error);
   }
 
-  $result = $db->query("SELECT * FROM hex_launch");
+  $result = $db->query("SELECT * FROM hex_launch2");
             $i = 1;
             $sum = 0;
             $hex_values="";
             while($val = $result->fetch_assoc()){
                 #print_r($val);
               if($i % 7 == 0){
-                $sum += $val['eth_in_hex'];
+                $sum += $val['usd_in_hex'];
                 #echo "<br />$i  is divisible by 7";
                 if ($i == 7){
-                  $hex_values=$hex_values.$sum/7/200;
+                  $hex_values=$hex_values.$sum/7*10000000;
                   #echo $eos_values;
                 }
                 else {
-                  $hex_values=$hex_values.", ".$sum/7/200;
+                  $hex_values=$hex_values.", ".$sum/7*10000000;
                   #echo $eos_values;
                 }
                 $sum = 0;
