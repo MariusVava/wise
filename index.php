@@ -109,7 +109,7 @@ $date_now = date("d-M-Y h:i",$t);
 $eth_user = str_replace(",","",$eth_all_time)/$total_users;
 $eth_user = round($eth_user, 4);
 ?>
-<img src="logo.png" class="rounded mx-auto d-block">
+
 <?php
 $days_left = (new DateTime('2020-12-30'))->diff(new DateTime())->days;
 $time_invest = $days_left+1;
@@ -166,6 +166,14 @@ function myFunction() {
 </h2>
 </div>
 </div>
+
+<div class="card">
+    <div class="card-header" id="headingOne">
+      <h2 class="mb-0">
+      <a class="btn btn-info btn-lg btn-block collapsed" href="wallets.php" role="button">[WISE WAL(L)E(T)S]</a>
+</div>
+</div>
+
 </div>
 &nbsp;
 <div class="container">
@@ -227,9 +235,15 @@ for($i = 0; $i < count($total_eth[1]); $i++) {
     if ($i <= $close){
         $tr = '<tr class="bg-danger">';
         $badge = '<td style="text-align:center;vertical-align:middle"><span class="badge badge-warning">CLOSED</span></td>';
+        $simulate_view = '<td style="text-align:left;vertical-align:middle">&nbsp;</td>';
     }
     else {
         $tr = $tr;
+        $simulate_view = '<td style="text-align:left;vertical-align:middle">
+        <div class="input-group-sm mb-3">
+            <input name="day'.$i.'" type="text" class="form-control" placeholder="+ETH" size="4">
+        </div>
+        </td>';
     }
     echo $tr;
     echo $badge;
@@ -257,11 +271,7 @@ for($i = 0; $i < count($total_eth[1]); $i++) {
     }
     echo  '<td style="text-align:right;vertical-align:middle">'.$total_eth[1][$i].' <span class="badge badge-light">ETH</span></td>';
     echo '<td style="text-align:left;vertical-align:middle">'.$eth_diff.'</td>';
-    echo '<td style="text-align:left;vertical-align:middle">
-    <div class="input-group-sm mb-3">
-        <input type="text" class="form-control" placeholder="+ETH" size="4">
-    </div>
-    </td>';
+    echo $simulate_view;
     echo  '<td style="vertical-align:middle">'.$eth_value.' <span class="badge badge-light">WISE</span></td>';
     $eth_value_all += $total_eth[1][$i];
     $wise_value = $total_eth[1][$i]/5000000;
