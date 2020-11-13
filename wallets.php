@@ -76,6 +76,7 @@ if ($db->connect_error) {
             </tr>
             <?php
             }
+            $db->close();
             ?>
 </tbody>
 </table>

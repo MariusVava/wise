@@ -28,7 +28,10 @@ $coindesk = file_get_contents($url_eth);
 preg_match('!<div><div><div><div class="BNeawe iBp4i AP7Wnd"><div><div class="BNeawe iBp4i AP7Wnd">(.*?)dolar american</div>!', $coindesk, $match_eth_price);
 $eth_price_kkt = $match_eth_price[1];
 
-$files = scandir('data', SCANDIR_SORT_DESCENDING);
+$dir = "data";
+chdir($dir);
+array_multisort(array_map('filemtime', ($files = glob("*.*"))), SORT_DESC, $files);
+#print_r($files);
 $newest_file = $files[0];
 
 $h24 = "btn-danger";
@@ -73,9 +76,10 @@ $last_update = str_replace("WISE Token - The Smartest Way to Earn Crypto (","",$
 $last_update = str_replace(").html","",$last_update);
 $last_update_previous = str_replace("WISE Token - The Smartest Way to Earn Crypto (","",$previous_file);
 $last_update_previous = str_replace(").html","",$last_update_previous);
-$folder = 'data\\';
-$newest_file = $folder.$newest_file;
-$previous_file = $folder.$previous_file;
+$folder = 'http://acidripp-home.ddns.net/wise/data/';
+$newest_file = str_replace(" ","%20",$folder.$newest_file);
+#echo $newest_file;
+$previous_file = str_replace(" ","%20",$folder.$previous_file);
 
 $content = file_get_contents($newest_file);
 $content_previous = file_get_contents($previous_file);
@@ -214,6 +218,9 @@ $value_multiplyer = 1.3;
 $wise_multiplyer = $value_multiplyer*$wise_value_estimate;
 $wise_worth_buying = round($wise_multiplyer, 4);
 $eth_value_all = 0;
+#chart arrays
+#$chart_wise_volume = array ();
+$chart_wise_value = "remove";
 for($i = 0; $i < count($total_eth[1]); $i++) {
 
     $eth_value = 5000000/$total_eth[1][$i];
@@ -283,13 +290,155 @@ for($i = 0; $i < count($total_eth[1]); $i++) {
     $roi = round($roi, 1);
     echo  '<td style="vertical-align:middle">'.$roi.' X</td>';
     echo "</tr>";
+    #create chart data
+    #array_push($chart_wise_volume, $total_eth[1][$i]);
+    $wise_value_chart = $wise_value*5000000;
+    #array_push($chart_wise_value, $wise_value_chart);
+    $chart_wise_value = $chart_wise_value.", ".$wise_value_chart;
 }
-
+$chart_wise_value = str_replace("remove, ","",$chart_wise_value);
 ?>
 
 </tbody>
 </table>
 </div>
+&nbsp;
+<div class="container-fluid">
+    <div class="row my-3">
+        <div class="col">
+            <center><h4><span class="badge badge-primary"><strong>EOS</strong></span> trending hystorical data vs <span class="badge badge-success"><strong>WISE</strong></span> live data</h4></center>
+            <br /><h6><span class="badge badge-primary">+</span> <strong>EOS</strong> volume traded <strong>in USD</strong> divided by 30.000 for scale, 1 point = 7 days</h6>
+            <br /><h6><span class="badge badge-success">+</span> <strong>WISE</strong> value <strong>in ETH</strong> multiplied by 5.000.000 for scale</h6>
+        </div>
+    </div>
+    <div class="row my-2">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                <canvas id="chLine" style="display: block"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- CHART SCRIPT -->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.13.0/umd/popper.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.js"></script>
+<script>
+  /* chart.js chart examples */
+
+// chart colors
+var colors = ['#007bff','#28a745','#333333','#c3e6cb','#dc3545','#6c757d'];
+
+/* large line chart */
+var chLine = document.getElementById("chLine");
+var chartData = {
+  labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50'],
+  /* EOS DATA */
+  <?php
+  error_reporting(0);
+  define('DB_NAME', 'wise'); //Your DB Name
+  define('DB_USER', 'wise'); //Your DB User Name
+  define('DB_PASSWORD', 'wise'); //Your DB Password
+  define('DB_HOST', 'localhost'); //Your Host Name
+    
+  // Create connection
+  $db = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+  // Check connection
+  if ($db->connect_error) {
+      die("Connection failed: " . $db->connect_error);
+  }
+
+  $result = $db->query("SELECT * FROM eos_chart");
+            $i = 1;
+            $sum = 0;
+            $eos_values="";
+            while($val = $result->fetch_assoc()){
+                #print_r($val);
+              if($i % 7 == 0){
+                $sum += $val['volume'];
+                #echo "<br />$i  is divisible by 7";
+                if ($i == 7){
+                  $eos_values=$eos_values.$sum/7/30000;
+                  #echo $eos_values;
+                }
+                else {
+                  $eos_values=$eos_values.", ".$sum/7/30000;
+                  #echo $eos_values;
+                }
+                $sum = 0;
+              }
+              else{
+                $sum += $val['volume'];
+                #echo "<br />$i <strong>is NOT divisible by 7</strong>";
+                #echo $eos_values;
+              }
+            $i++;
+            }
+  $db->close();
+  ?>
+  datasets: [{
+    data: [<?php echo $eos_values; ?>],
+    backgroundColor: 'transparent',
+    borderColor: colors[0],
+    borderWidth: 4,
+    pointBackgroundColor: colors[0]
+  },
+  /* WISE DATA */
+  {
+    <?php
+    /*
+      #$chart_wise_value
+      function str_putcsv($data) {
+        # Generate CSV data from array
+        $fh = fopen('php://temp', 'rw'); # don't create a file, attempt
+                                         # to use memory instead
+
+        # write out the headers
+        fputcsv($fh, array_keys(current($data)));
+
+        # write out the data
+        foreach ( $data as $row ) {
+                fputcsv($fh, $row);
+        }
+        rewind($fh);
+        $csv = stream_get_contents($fh);
+        fclose($fh);
+
+        return $csv;
+      }
+      */
+    ?>
+    data: [<?php echo $chart_wise_value; ?>],
+    backgroundColor: colors[3],
+    borderColor: colors[1],
+    borderWidth: 4,
+    pointBackgroundColor: colors[1]
+  }]
+};
+
+if (chLine) {
+  new Chart(chLine, {
+  type: 'line',
+  data: chartData,
+  options: {
+    scales: {
+      yAxes: [{
+        ticks: {
+          beginAtZero: false
+        }
+      }]
+    },
+    legend: {
+      display: false
+    }
+  }
+  });
+}
+
+
+  </script>
 <?php
 $endtime = microtime(true);
 ?>
