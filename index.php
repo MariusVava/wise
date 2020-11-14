@@ -319,7 +319,7 @@ $chart_wise_value = str_replace("remove, ","",$chart_wise_value);
         <div class="col">
             <center><h4><span class="badge badge-primary"><strong>EOS/HEX</strong></span> trending hystorical data vs <span class="badge badge-success"><strong>WISE</strong></span> live data</h4></center>
             <br /><h6><span class="badge badge-primary">+</span> <strong>EOS</strong> volume traded <strong>in USD</strong> divided by 30.000 for scale, 1 point = 7 days</h6>
-            <br /><h6><span class="badge badge-danger">+</span> <strong>USD</strong> value <strong>in HEX</strong> multiplied by 10.000.000 for scale, 1 point = 7 days</h6>
+            <br /><h6><span class="badge badge-danger">+</span> <strong>ETH</strong> value <strong>in HEX</strong> divided by 200 for scale, 1 point = 7 days</h6>
             <br /><h6><span class="badge badge-success">+</span> <strong>WISE</strong> value <strong>in ETH</strong> multiplied by 5.000.000 for scale</h6>
         </div>
     </div>

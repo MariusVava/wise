@@ -50,6 +50,10 @@ if ($db->connect_error) {
       <h2 class="mb-0">
       <a class="btn btn-info btn-lg btn-block collapsed" href="../wise/" role="button">[WISE STATISTICS]</a>
 </div>
+<div class="card-header" id="headingOne">
+      <h2 class="mb-0">
+      <a class="btn btn-info btn-lg btn-block collapsed" href="#sum" role="button">[TOTAL NO. TRANSACTIONS]</a>
+</div>
 </div>
 &nbsp;
 <div class="container">
@@ -66,7 +70,14 @@ if ($db->connect_error) {
   <tbody>
         <?php
         $result = $db->query("SELECT * FROM wallets");
-            while($val = $result->fetch_assoc()){  ?>
+        $transaction_sum = 0;
+        $no_wallets = 0;
+        $eth_transacted = 0;
+            while($val = $result->fetch_assoc()){
+              $transaction_sum += $val['transactions'];  
+              $no_wallets++;
+              $eth_transacted += $val['total'];
+              ?>
             <tr>
                 <td><?php echo $val['id']; ?></td>
                 <td><a href="https://etherscan.io/address/<?php echo $val['wallet']; ?>" target="_blank"><span class="badge badge-warning">&#x1F50D;</span></a> <?php echo $val['wallet']; ?></td>
@@ -80,6 +91,7 @@ if ($db->connect_error) {
             ?>
 </tbody>
 </table>
+<center><h4 id="sum">Total transactions made <strong><?php echo $transaction_sum; ?></strong> from <strong><?php echo $no_wallets; ?></strong> addresses, totalling <strong><?php echo round($eth_transacted, 2); ?> ETH</strong></h4></center>
 </div>
 <?php
 $endtime = microtime(true);
