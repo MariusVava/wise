@@ -79,7 +79,16 @@ if ($db->connect_error) {
                 <a href="https://etherscan.io/address/<?php echo $val['wallet']; ?>" target="_blank"><span class="badge badge-warning">&#x1F50D;</span></a> 
                 <!-- WALLET TRANSACTIONS INFO -->
                 <a href="#" role="button" data-toggle="modal" data-target="#wallet<?php echo $no_wallets; ?>"><span class="badge badge-info">TRANSACTIONS</span></a> 
-                <?php echo $val['wallet']; ?>
+                <?php 
+                #check for creator wallet and display it in red
+                $creator_wallet = "0x641ad78baca220c5bd28b51ce8e0f495e85fe689";
+                if ($val['wallet'] == $creator_wallet){
+                  echo '<span class="badge badge-danger">'.$val['wallet'].'</span>';
+                }
+                else{
+                  echo $val['wallet']; 
+                }
+                ?>
 <!-- TRANSACTION DATA -->
 <div class="modal fade" id="wallet<?php echo $no_wallets; ?>" tabindex="-1" role="dialog" aria-labelledby="wallet<?php echo $no_wallets; ?>" aria-hidden="true">
   <div class="modal-dialog" role="document">
